@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <nav>
+        <div class="nav-wrapper light-blue">
+            <a href="#" class="brand-logo">Telecloud</a>
+        </div>
+    </nav>
+
+    <section id="empty_files">
+        <img src="images/butterfly.png">
+        <h4>Woah dude, it's a hella empty!</h4>
+    </section>
+    <section id="load_files">
+        <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="gap-patch">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+        <br>
+    </section>
+
+    <section id="files">
+        <div class="file z-depth-3" data-id="100500" data-dir="main" data-is_dir="false" data-size="1024">
+            <img src="images/unknown_type.png">
+            <h6>History of the walking dead.txt</h6>
+            <center class="info_section">
+                <a class="waves-effect waves-teal btn-flat" onclick="downloadFile('catalog', 'file_id')">Download</a>
+                <span class="material-icons properties_icon">
+                    info
+                </span>
+            </center>
+        </div>
+
+        <div class="file z-depth-3" data-id="100500" data-dir="main" data-is_dir="true" data-size="1024">
+            <img src="images/folder.png">
+            <h6>Homework</h6>
+            <center class="info_section">
+                <a class="waves-effect waves-teal btn-flat" onclick="listDirectory('catalog')">Open</a>
+                <span class="material-icons properties_icon">
+                    info
+                </span>
+            </center>
+        </div>
+    </section>
+
+    <!--JavaScript at end of body for optimized loading-->
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+
+
+    <input id="file_upload" type="file" multiple="multiple">
+
+
+
+    <a class="btn-floating btn-large waves-effect waves-light red scale-transition scale-out" id="uploadButton"
+        style="position: fixed; right: 17px; bottom: 25px;" onclick="initiaiteUpload()"><i
+            class="material-icons">cloud_upload</i></a>
+
+    <a class="btn-floating btn-large waves-effect waves-light red scale-transition scale-out" id="backButton"
+        style="position: fixed; right: 94px; bottom: 25px;" onclick="listDirectory(previous_catalog)"><i
+            class="material-icons">arrow_back</i></a>
+
+    <script>
+        var $ = (q) => document.querySelector(q);
+        var filesToUpload = [];
+        var current_dir = 'main';
+        var previous_catalog = 'main';
+        const UPLOAD_BUTTON = document.querySelector("#uploadButton");
+        const BACK = document.querySelector("#backButton");
+        const FILES = document.querySelector("#files");
+        const EMPTY_STATE = document.querySelector("#empty_files");
+        const NEW_FILE_TEMPLATE = `<div class="file z-depth-3" data-id="{ID}" data-dir="{DIR}" data-is_dir="false" data-size="{SIZE}">
+            <img src="{image}">
+            <h6>{name}</h6>
+            <center class="info_section">
+                <a class="waves-effect waves-teal btn-flat" onclick="downloadFile('{ID}', '{DIR}')">Download</a>
+                <span class="material-icons properties_icon">
+                    info
+                </span>
+            </center>
+        </div>`;
+
+        const NEW_CATALOG_TEMPLATE = `<div class="file z-depth-3" data-id="{ID}" data-dir="{DIR}" data-is_dir="true" data-size="{SIZE}">
+            <img src="images/folder.png">
+            <h6>{name}</h6>
+            <center class="info_section">
+                <a class="waves-effect waves-teal btn-flat" onclick="listDirectory('{ID}')">Open</a>
+                <span class="material-icons properties_icon">
+                    info
+                </span>
+            </center>
+        </div>`;
+        const uploader = document.querySelector("#file_upload");
+        async function initiaiteUpload() {
+            uploader.click();
+        }
+
+        document.onclick = () => {
+            console.log("Clcik!");
+            $("#contextmenu").hidden = true;
+        };
+        uploader.addEventListener("change", handleFiles, false);
+
+        async function handleFiles() {
+            const fileList = this.files;
+            for (file of fileList) {
+                filesToUpload.push(file);
+            }
+
+            console.log(filesToUpload);
+            let form = new FormData;
+            filesToUpload.forEach((file, i) => {
+                console.log("Add file");
+                form.append(`file_${i}`, file)
+            });
+            console.log(form);
+            try{
+
+            await fetch(`/upload/${current_dir}/`, {
+                method: "POST", body: form
+            });
+
+            filesToUpload.forEach((file, i) => {
+                console.log("Add file");
+                form.append(`file_${i}`, file)
+                M.toast({ html: `File ${file.name} uploaded!` })
+            });
+
+            } catch (e){
+                M.toast({ html: `F-f-failed to upload files :(` })  
+            } finally {
+            filesToUpload = [];
+            listDirectory(current_dir);
+            }
+
+
+        }
+
+
+        async function apiCall(method, params) {
+            let response = await fetch(`/api/${method}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify(params)
+            });
+
+            return await response.json();
+        }
+
+        async function makeDir(catalog_name) {
+            let resp = await apiCall("createCatalog", { catalog_name, current_catalog: current_dir });
+        }
+
+        async function getFiles(catalog) {
+            return await apiCall("getFiles", { catalog })
+        }
+
+        window.addEventListener('load', async () => {
+            $("#contextmenu").hidden = true;
+            await listDirectory("main");
+        })
+
+        function drawFile(filename, size, extension, preview, is_catalog, id, dir, file_id) {
+            let template;
+            let image = "images/unknown_type.png";
+            if (preview != "none") image = preview.replace(".", "");
+
+            console.log(image);
+            if (is_catalog == "false") {
+                template = NEW_FILE_TEMPLATE;
+                template = template.replace("{ID}", file_id).replace("{ID}", file_id).replace("{ID}", file_id).replace("{DIR}", dir).replace("{DIR}", dir).replace("{SIZE}", size).replace("{image}", image).replace("{name}", filename).replace("{name}", filename);
+            } else {
+                template = NEW_CATALOG_TEMPLATE;
+                template = template.replace("{ID}", id).replace("{ID}", id).replace("{ID}", id).replace("{DIR}", dir).replace("{SIZE}", size).replace("{image}", image).replace("{name}", filename).replace("{name}", filename);
+
+                // TODO: catalog
+            }
+            FILES.innerHTML += template;
+            console.log("Loaded");
+        }
+
+        async function listDirectory(catalog) {
+            previous_catalog = current_dir;
+            if (catalog != "main") BACK.classList.remove("scale-out");
+            else BACK.classList.add("scale-out");
+
+
+            FILES.innerHTML = "";
+            document.querySelector("#load_files").style.visibility = "visible";
+            current_dir = catalog;
+            let files = await getFiles(catalog);
+            console.log("loaded", files);
+            for (i in files) {
+                let file = files[i];
+                console.log(file);
+                drawFile(file.filename, file.extension, file.size, file.preview, file.is_catalog, file.id, catalog, file._id["$oid"]);
+            }
+            document.querySelector("#load_files").style.visibility = "hidden";
+            UPLOAD_BUTTON.classList.remove("scale-out");
+
+            if (files.length == 0) {
+                EMPTY_STATE.style.display = "block";
+            } else {
+                EMPTY_STATE.style.display = "none";
+            }
+        }
+
+        document.oncontextmenu = (data, id) => {
+            console.log(data, id);
+            $("#contextmenu").hidden = false;
+            $("#contextmenu").style.left = `${data.screenX}px`;
+            $("#contextmenu").style.top = `${data.screenY - 100}px`;
+            if (data.target.tagName == "HTML") {
+                console.log("HTML!");
+                $("#contextmenu #file").hidden = true;
+                $("#contextmenu #global").hidden = false;
+                // it's html, make a global contextmenu
+            } else {
+                $("#contextmenu #file").hidden = false;
+                $("#contextmenu #global").hidden = false;
+                var elements = data.path;
+                var element = { type: 'dir', id: "-1" };
+                for (i in elements) {
+                    let elem = elements[i];
+                    console.log(elem);
+                    console.log();
+                    if (typeof elem['dataset'] !== 'undefined') {
+                        if (typeof elem['dataset']['is_dir'] != 'undefined') {
+                            if (elem['dataset']['is_dir'] == "true") {
+                                element.type = "dir";
+                            } else {
+                                element.type = "file";
+                            }
+
+                            element.id = elem['dataset']['id'];
+
+                        }
+                    }
+                }
+                console.log(element);
+            }
+
+            return false;
+        }
+
+    </script>
+    <section id="contextmenu">
+        <section id="global">
+            <div class="collection">
+                <a href="#!" class="collection-item waves-effect"
+                    onclick="let catalog = prompt('Enter catalog name'); if (!!catalog) makeDir(catalog); listDirectory(current_dir)">Add
+                    catalog</a>
+            </div>
+        </section>
+        <section id="file">
+            <div class="collection">
+                <a href="#!" class="collection-item waves-effect" style="color: #d31414;"><span class="material-icons">
+                        delete
+                    </span>
+                    <p>Remove</p>
+                </a>
+                <a href="#!" class="collection-item waves-effect">Add tag</a>
+            </div>
+        </section>
+    </section>
+
+    <style>
+        #files {
+            position: relative;
+            top: 20px;
+        }
+
+        #load_files {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #empty_files {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            display: none;
+            transform: translate(-50%, -50%);
+        }
+
+        #empty_files h4 {
+            left: 6%;
+            position: relative;
+        }
+
+        .file {
+            background-color: #fff6f6;
+            width: 180px;
+            height: 273px;
+            display: inline-block;
+            float: left;
+            margin-left: 25px;
+            margin-top: 15px;
+
+        }
+
+        .file h6 {
+            text-align: center;
+            position: relative;
+            top: 0px;
+            height: 21px;
+            color: #221122;
+            width: 156px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 10px;
+        }
+
+        .file img {
+            max-width: 80%;
+            max-height: 50%;
+            position: relative;
+            left: 17px;
+            min-height: 50%;
+            min-width: 80%;
+        }
+
+        #file_upload {
+            display: none;
+        }
+
+        #contextmenu {
+            background-color: white;
+            color: #111111;
+            width: 200px;
+            position: fixed;
+            left: 271px;
+            height: 99px;
+            /* visibility: hidden; */
+        }
+
+        #contextmenu p {
+            display: inline;
+            line-height: 25px;
+            position: absolute;
+            top: -5px;
+
+            left: 52px;
+        }
+
+        .properties_icon {
+            float: right;
+            position: relative;
+            right: 10px;
+            font-size: 24px;
+            bottom: -8px;
+            cursor: pointer;
+            color: #898181;
+            user-select: none;
+        }
+
+        .properties_icon:hover {
+            color: #363434;
+        }
+
+        .info_section {
+            position: relative;
+            top: 46px;
+            left: 2px;
+        }
+    </style>
+
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+filesize_limit = 1024000 # in bytes
+telegram_token = "1184285829:AAGhG8WUbL30iiGSiID41Q8wI9kS7_bNSA4"
+telegram_chatid = 279772081
+server_port = 8080
