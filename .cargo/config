@@ -1,6 +1,0 @@
-[target.x86_64-pc-windows-gnu]
-rustflags = [
-    "--sysroot", "/usr/x86_64-w64-mingw32/",
-]
-
-

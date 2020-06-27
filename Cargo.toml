@@ -18,12 +18,10 @@ tokio = {version="*", features=["full"]}
 actix-files = "*"
 actix-multipart = "*"
 futures = "*"
-ejdb = "*"
 image = "*"
 serde_json = "1.0"
 uuid = {version="*", features=["v4"]}
 teloxide = "*"
 reqwest = {version="*", features=["socks"]}
-bson = "*"
 elementtree = "*"
-sqlite = {git = "https://github.com/stainless-steel/sqlite"}
+rusqlite = {git = "https://github.com/DuckerMan/rusqlite" ,features=["bundled"]}

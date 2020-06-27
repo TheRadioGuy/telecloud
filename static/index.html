@@ -181,15 +181,15 @@
             await listDirectory("main");
         })
 
-        function drawFile(filename, size, extension, preview, is_catalog, id, dir, file_id) {
+        function drawFile(filename, size, extension, is_catalog, id, dir) {
             let template;
             let image = "images/unknown_type.png";
-            if (preview != "none") image = preview.replace(".", "");
+            let preview = image;
 
             console.log(image);
-            if (is_catalog == "false") {
+            if (!is_catalog) {
                 template = NEW_FILE_TEMPLATE;
-                template = template.replace("{ID}", file_id).replace("{ID}", file_id).replace("{ID}", file_id).replace("{DIR}", dir).replace("{DIR}", dir).replace("{SIZE}", size).replace("{image}", image).replace("{name}", filename).replace("{name}", filename);
+                template = template.replace("{ID}", id).replace("{ID}", id).replace("{ID}", id).replace("{DIR}", dir).replace("{DIR}", dir).replace("{SIZE}", size).replace("{image}", image).replace("{name}", filename).replace("{name}", filename);
             } else {
                 template = NEW_CATALOG_TEMPLATE;
                 template = template.replace("{ID}", id).replace("{ID}", id).replace("{ID}", id).replace("{DIR}", dir).replace("{SIZE}", size).replace("{image}", image).replace("{name}", filename).replace("{name}", filename);
@@ -214,7 +214,7 @@
             for (i in files) {
                 let file = files[i];
                 console.log(file);
-                drawFile(file.filename, file.extension, file.size, file.preview, file.is_catalog, file.id, catalog, file._id["$oid"]);
+                drawFile(file.filename, file.extension, file.size, file.is_catalog, file.id, catalog);
             }
             document.querySelector("#load_files").style.visibility = "hidden";
             UPLOAD_BUTTON.classList.remove("scale-out");

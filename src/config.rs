@@ -2,8 +2,6 @@ use serde_derive::Deserialize;
 use std::env;
 use std::fs::File;
 use std::io::{Read, Write};
-use std::panic::catch_unwind;
-use std::path::PathBuf;
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
     pub filesize_limit: u64,

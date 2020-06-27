@@ -1,9 +1,8 @@
 use crate::filestruct;
 use actix_files as fs;
 use actix_multipart::Multipart;
-use actix_web::{get, web, App, Error, HttpResponse, HttpServer, Responder, http::Method, HttpRequest, web::Bytes};
+use actix_web::{web, App, Error, HttpResponse, HttpServer, Responder, http::Method};
 use futures::{StreamExt, TryStreamExt};
-use serde_derive::Deserialize;
 use serde_json::Value;
 use std::convert::TryInto;
 use std::io::Write;
@@ -14,7 +13,8 @@ use teloxide::prelude::*;
 use teloxide::types::ChatId;
 use teloxide::types::InputFile;
 use tokio::fs::File;
-use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use rusqlite::NO_PARAMS;
 use tokio::io::{BufReader, BufWriter};
 pub static mut CONFIG: Option<crate::config::Config> = None;
 pub static mut CHANNEL: Option<Arc<Mutex<mpsc::Sender<crate::filestruct::SendedFile>>>> = None;
@@ -29,7 +29,7 @@ async fn api(data: web::Json<Value>, info: web::Path<String>) -> impl Responder 
     match method {
         "getFiles" => {
             let catalog = data["catalog"].as_str().unwrap_or("main");
-            let files = filestruct::get_all_files(catalog).unwrap_or(vec![]);
+            let files = filestruct::get_all_files(catalog);
             let string = serde_json::to_string(&files).unwrap();
             response = format!("{}", string);
         }
@@ -119,7 +119,7 @@ pub async fn run(config: crate::config::Config) {
                 let mut parts = String::from("0");
                 let mut reader_file = File::open(info.file.clone()).await.unwrap();
                 let filesize = reader_file.metadata().await.unwrap().len();
-                info.info.insert("size", filesize);
+                info.info.size = filesize.try_into().unwrap();
 
                 if filesize > MEGABYTES_50 {
                     let times_of_large_read = filesize / MEGABYTES_50;
@@ -173,12 +173,8 @@ pub async fn run(config: crate::config::Config) {
                     }
 
                     info!("Splited, ids: {:#?}", parts_ids);
-                    parts_ids.iter().for_each(|id| {
-                        parts.push_str(&format!("{},", id));
-                    });
 
-                    info!("Splited and converted: {}", parts);
-                    info.info.insert("parts", parts);
+                    info.info.parts = parts_ids;
                 } else {
                     info!("Small file, doesnt need to be splitted up");
                     info!("Sending document to chat {}", chat_id);
@@ -188,21 +184,18 @@ pub async fn run(config: crate::config::Config) {
                         .await
                         .unwrap();
                     info!("Sended! {:#?}", msg);
-                    info.info.insert("telegram_id", msg.id);
-                    info.info.insert("parts", parts);
+                    info.info.telegram_id = msg.id.try_into().unwrap();
+                    info.info.parts = vec![0];
                 }
 
                 tokio::fs::remove_file(info.file.clone()).await.unwrap();
 
-                let db = unsafe {
-                    &*crate::filestruct::DATABASE
-                        .as_mut()
-                        .unwrap()
-                        .write()
-                        .unwrap()
-                };
-                let coll = db.collection(info.catalog.as_str()).unwrap();
-                coll.save(&info.info).unwrap();
+                let mut db = rusqlite::Connection::open("./database/files.db").unwrap();
+               
+
+                let catalog_name = info.catalog.as_str();
+                info.info.insert(catalog_name, &mut db);// insert catalog into current one
+
                 info!("Saved to database!");
             })
             .await

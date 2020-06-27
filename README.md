@@ -3,7 +3,7 @@
 
 ![Telecloud](https://sun1-93.userapi.com/OckdApqVziooIA6VkeD41fJKwmhB-tNJ94UyKQ/1xlHFi28h4s.jpg)
 
-
+## NOT READY FOR RELEASE, THIS IS DEVELOPMENT VERSION
 
 ## What is it?
 It's a file storage where all your files are stored in Telegram servers. So, it works like:
@@ -21,6 +21,8 @@ You can download it [there](https://github.com/DuckerMan/telecloud/releases)
 - [ ] WebDAV support (**help wanted**)
 - [ ] File downloading 
 - [ ] Make code less shitty
+- [ ] Windows/MacOS support
+- [ ] Official client 
 
 ### Contributors:
 [Sergey the Duck](https://vk.com/duckermanit) - Realization
