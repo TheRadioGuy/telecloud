@@ -2156,6 +2156,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+ "sqlite",
  "teloxide",
  "tokio",
  "toml",
@@ -2206,6 +2207,35 @@ dependencies = [
  "libc",
  "redox_syscall",
  "winapi 0.3.8",
+]
+
+[[package]]
+name = "sqlite"
+version = "0.25.3"
+source = "git+https://github.com/stainless-steel/sqlite#f2cf430385be75b7c15b33bb1487f10958f859b3"
+dependencies = [
+ "libc",
+ "sqlite3-sys",
+]
+
+[[package]]
+name = "sqlite3-src"
+version = "0.2.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b8bb25e66d026488228a97e0ad21e3d15ec5998dcd9ad73c97cc277c56a6b314"
+dependencies = [
+ "cc",
+ "pkg-config",
+]
+
+[[package]]
+name = "sqlite3-sys"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71fec807a1534bd13eeaaec396175d67c79bdc68df55e18a452726ec62a8fb08"
+dependencies = [
+ "libc",
+ "sqlite3-src",
 ]
 
 [[package]]

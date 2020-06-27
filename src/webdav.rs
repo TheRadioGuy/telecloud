@@ -1,11 +1,14 @@
 use actix_web::{http, http::StatusCode, dev::HttpResponseBuilder, get, web, App, Error, HttpResponse, HttpServer, Responder, http::Method, HttpRequest, web::Bytes};
 
 pub async fn webdav_handle(req: HttpRequest, body: Bytes) -> HttpResponse {
+    println!("----------------------------");
+    println!("----------------------------");
+    println!("----------------------------");
+    
     dbg!(&req);
     let method = req.method().as_str();
     let text = String::from_utf8(body.to_vec()).unwrap();
     println!("{}", text);
-    dbg!(method);
 
     let response = match method {
         "OPTIONS" => handle_option(req, text).await,

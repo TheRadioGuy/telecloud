@@ -26,3 +26,4 @@ teloxide = "*"
 reqwest = {version="*", features=["socks"]}
 bson = "*"
 elementtree = "*"
+sqlite = {git = "https://github.com/stainless-steel/sqlite"}
