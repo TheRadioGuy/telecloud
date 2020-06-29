@@ -1,5 +1,3 @@
-
-
 // fn main(){
 //     let root = Element::from_reader(r#"<?xml version="1.0"?>
 // <root xmlns="tag:myns" xmlns:foo="tag:otherns">
@@ -19,10 +17,10 @@
 
 use elementtree::Element;
 
-
-fn main(){
+fn main() {
     // create_dir_if_dont_exist!("fff", "ffff").await;
-    let root = Element::from_reader(r#"<?xml version="1.0" encoding="utf-8"?>
+    let root = Element::from_reader(
+        r#"<?xml version="1.0" encoding="utf-8"?>
     <propfind xmlns="DAV:"><prop>
     <getcontentlength xmlns="DAV:"/>
     <getlastmodified xmlns="DAV:"/>
@@ -31,15 +29,14 @@ fn main(){
     <checked-in xmlns="DAV:"/>
     <checked-out xmlns="DAV:"/>
     </prop></propfind>
-    "#.as_bytes()).unwrap();
-let list = root.find("{DAV:}prop").unwrap();
-for child in root.children(){
-
-
-
-    println!("attribute: {:?}", child);
-}
-
+    "#
+        .as_bytes(),
+    )
+    .unwrap();
+    let list = root.find("{DAV:}prop").unwrap();
+    for child in root.children() {
+        println!("attribute: {:?}", child);
+    }
 }
 
 #[macro_export]

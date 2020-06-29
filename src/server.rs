@@ -1,8 +1,9 @@
 use crate::filestruct;
 use actix_files as fs;
 use actix_multipart::Multipart;
-use actix_web::{web, App, Error, HttpResponse, HttpServer, Responder, http::Method};
+use actix_web::{http::Method, web, App, Error, HttpResponse, HttpServer, Responder};
 use futures::{StreamExt, TryStreamExt};
+use rusqlite::NO_PARAMS;
 use serde_json::Value;
 use std::convert::TryInto;
 use std::io::Write;
@@ -14,12 +15,10 @@ use teloxide::types::ChatId;
 use teloxide::types::InputFile;
 use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use rusqlite::NO_PARAMS;
 use tokio::io::{BufReader, BufWriter};
 pub static mut CONFIG: Option<crate::config::Config> = None;
 pub static mut CHANNEL: Option<Arc<Mutex<mpsc::Sender<crate::filestruct::SendedFile>>>> = None;
 const MEGABYTES_50: u64 = 50000000;
-
 
 // #[get("/api/{method}/")]
 async fn api(data: web::Json<Value>, info: web::Path<String>) -> impl Responder {
@@ -159,7 +158,7 @@ pub async fn run(config: crate::config::Config) {
                         info!("New filename: {:?}", part_name);
                         let mut writer = BufWriter::new(File::create(&part_name).await.unwrap());
                         writer.write_all(&buff).await.unwrap();
-                        writer.flush().await;
+                        writer.flush().await.unwrap();
                         info!("Sending part with name: {:?}", part_name);
                         tokio::time::delay_for(std::time::Duration::from_secs(1)).await; // or else telegram will ban us
                         let msg = bot_cloned
@@ -191,10 +190,9 @@ pub async fn run(config: crate::config::Config) {
                 tokio::fs::remove_file(info.file.clone()).await.unwrap();
 
                 let mut db = rusqlite::Connection::open("./database/files.db").unwrap();
-               
 
                 let catalog_name = info.catalog.as_str();
-                info.info.insert(catalog_name, &mut db);// insert catalog into current one
+                info.info.insert(catalog_name, &mut db); // insert catalog into current one
 
                 info!("Saved to database!");
             })
@@ -205,29 +203,24 @@ pub async fn run(config: crate::config::Config) {
 
     println!("Started on 127.0.0.1:{}", port);
 
-    
     HttpServer::new(|| {
         let propfind = Method::from_bytes(b"GET").unwrap();
         App::new()
             .service(fs::Files::new("/static", "./static").show_files_listing())
-            .service(fs::Files::new("/preview", "./preview").show_files_listing())
-            // .service(api)
             .route("/api/{method}/", web::post().to(api))
             .route("/upload/{dir}/", web::post().to(save_file))
-            .service(
-                web::scope("/webdav")
-                    .default_service(web::to(crate::webdav::webdav_handle))
-            )
-            // .service(
-            //     // web::scope("/webdav").route("/", web::get().to(webdav)),
-            //     // web::scope("/webdav").route("/", web::method(propfind).to(webdav)) 
-            //     web::scope("/webdav").route("/", web::route().to(webdav))
-            // )
+            .service(web::scope("/webdav").default_service(web::to(crate::webdav::webdav_handle)))
+        // .service(
+        //     // web::scope("/webdav").route("/", web::get().to(webdav)),
+        //     // web::scope("/webdav").route("/", web::method(propfind).to(webdav))
+        //     web::scope("/webdav").route("/", web::route().to(webdav))
+        // )
     })
     .bind(&format!("127.0.0.1:{}", port))
     .unwrap()
     .run()
-    .await;
+    .await
+    .unwrap();
 
-    sys.await;
+    sys.await.unwrap();
 }

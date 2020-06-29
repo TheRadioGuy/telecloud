@@ -1,0 +1,139 @@
+<D:multistatus xmlns:D="DAV:" xmlns:ns0="DAV:">
+    <D:response xmlns:lp1="DAV:" xmlns:lp2="http://apache.org/dav/props/" xmlns:g0="DAV:">
+        <D:href>/webdav/</D:href>
+        <D:propstat>
+            <D:prop>
+                <lp1:creationdate>2020-06-25T16:24:13Z</lp1:creationdate>
+                <D:getcontenttype>httpd/unix-directory</D:getcontenttype>
+                <lp1:getetag>"1000-5a8eb05e46786"</lp1:getetag>
+                <lp1:getlastmodified>Thu, 25 Jun 2020 16:24:13 GMT</lp1:getlastmodified>
+                <lp1:resourcetype>
+                    <D:collection />
+                </lp1:resourcetype>
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+        <D:propstat>
+            <D:prop>
+                <g0:displayname />
+                <g0:getcontentlength />
+            </D:prop>
+            <D:status>HTTP/1.1 404 Not Found</D:status>
+        </D:propstat>
+    </D:response>
+    <D:response xmlns:lp1="DAV:" xmlns:lp2="http://apache.org/dav/props/" xmlns:g0="DAV:">
+        <D:href>/webdav/Telecloud.png</D:href>
+        <D:propstat>
+            <D:prop>
+                <lp1:creationdate>2020-06-25T16:24:05Z</lp1:creationdate>
+                <lp1:getcontentlength>48336</lp1:getcontentlength>
+                <D:getcontenttype>text/x-dsrc</D:getcontenttype>
+                <lp1:getetag>"{change me dude}"</lp1:getetag>
+                <lp1:getlastmodified>Thu, 25 Jun 2020 16:24:05 GMT</lp1:getlastmodified>
+                <lp1:resourcetype />
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+        <D:propstat>
+            <D:prop>
+                <g0:displayname />
+            </D:prop>
+            <D:status>HTTP/1.1 404 Not Found</D:status>
+        </D:propstat>
+    </D:response><D:response xmlns:lp1="DAV:" xmlns:lp2="http://apache.org/dav/props/" xmlns:g0="DAV:">
+        <D:href>/webdav/files.json</D:href>
+        <D:propstat>
+            <D:prop>
+                <lp1:creationdate>2020-06-25T16:24:05Z</lp1:creationdate>
+                <lp1:getcontentlength>1581056</lp1:getcontentlength>
+                <D:getcontenttype>text/x-dsrc</D:getcontenttype>
+                <lp1:getetag>"{change me dude}"</lp1:getetag>
+                <lp1:getlastmodified>Thu, 25 Jun 2020 16:24:05 GMT</lp1:getlastmodified>
+                <lp1:resourcetype />
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+        <D:propstat>
+            <D:prop>
+                <g0:displayname />
+            </D:prop>
+            <D:status>HTTP/1.1 404 Not Found</D:status>
+        </D:propstat>
+    </D:response><D:response xmlns:lp1="DAV:" xmlns:lp2="http://apache.org/dav/props/" xmlns:g0="DAV:">
+        <D:href>/webdav/07747D598FF9.txt</D:href>
+        <D:propstat>
+            <D:prop>
+                <lp1:creationdate>2020-06-25T16:24:05Z</lp1:creationdate>
+                <lp1:getcontentlength>2571</lp1:getcontentlength>
+                <D:getcontenttype>text/x-dsrc</D:getcontenttype>
+                <lp1:getetag>"{change me dude}"</lp1:getetag>
+                <lp1:getlastmodified>Thu, 25 Jun 2020 16:24:05 GMT</lp1:getlastmodified>
+                <lp1:resourcetype />
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+        <D:propstat>
+            <D:prop>
+                <g0:displayname />
+            </D:prop>
+            <D:status>HTTP/1.1 404 Not Found</D:status>
+        </D:propstat>
+    </D:response><D:response xmlns:lp1="DAV:" xmlns:lp2="http://apache.org/dav/props/" xmlns:g0="DAV:">
+        <D:href>/webdav/вгсл</D:href>
+        <D:propstat>
+            <D:prop>
+                <lp1:creationdate>2020-06-25T16:24:05Z</lp1:creationdate>
+                <lp1:getcontentlength>0</lp1:getcontentlength>
+                <D:getcontenttype>httpd/unix-directory</D:getcontenttype>
+                <lp1:getetag>"{change me dude}"</lp1:getetag>
+                <lp1:getlastmodified>Thu, 25 Jun 2020 16:24:05 GMT</lp1:getlastmodified>
+                <lp1:resourcetype />
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+        <D:propstat>
+            <D:prop>
+                <g0:displayname />
+            </D:prop>
+            <D:status>HTTP/1.1 404 Not Found</D:status>
+        </D:propstat>
+    </D:response><D:response xmlns:lp1="DAV:" xmlns:lp2="http://apache.org/dav/props/" xmlns:g0="DAV:">
+        <D:href>/webdav/files.json</D:href>
+        <D:propstat>
+            <D:prop>
+                <lp1:creationdate>2020-06-25T16:24:05Z</lp1:creationdate>
+                <lp1:getcontentlength>1581056</lp1:getcontentlength>
+                <D:getcontenttype>text/x-dsrc</D:getcontenttype>
+                <lp1:getetag>"{change me dude}"</lp1:getetag>
+                <lp1:getlastmodified>Thu, 25 Jun 2020 16:24:05 GMT</lp1:getlastmodified>
+                <lp1:resourcetype />
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+        <D:propstat>
+            <D:prop>
+                <g0:displayname />
+            </D:prop>
+            <D:status>HTTP/1.1 404 Not Found</D:status>
+        </D:propstat>
+    </D:response><D:response xmlns:lp1="DAV:" xmlns:lp2="http://apache.org/dav/props/" xmlns:g0="DAV:">
+        <D:href>/webdav/ostechnix.txt</D:href>
+        <D:propstat>
+            <D:prop>
+                <lp1:creationdate>2020-06-25T16:24:05Z</lp1:creationdate>
+                <lp1:getcontentlength>53477376</lp1:getcontentlength>
+                <D:getcontenttype>text/x-dsrc</D:getcontenttype>
+                <lp1:getetag>"{change me dude}"</lp1:getetag>
+                <lp1:getlastmodified>Thu, 25 Jun 2020 16:24:05 GMT</lp1:getlastmodified>
+                <lp1:resourcetype />
+            </D:prop>
+            <D:status>HTTP/1.1 200 OK</D:status>
+        </D:propstat>
+        <D:propstat>
+            <D:prop>
+                <g0:displayname />
+            </D:prop>
+            <D:status>HTTP/1.1 404 Not Found</D:status>
+        </D:propstat>
+    </D:response>
+</D:multistatus>

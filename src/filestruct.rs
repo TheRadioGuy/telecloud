@@ -1,6 +1,3 @@
-use image::imageops::FilterType;
-use image::ImageFormat;
-const IMAGES: &[&str] = &["png", "jpg", "jpeg"];
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -72,7 +69,6 @@ pub fn get_all_files(catalog: &str) -> Vec<File>{
 
 pub fn get_file(id: &str) {}
 
-// TODO: Subcatalogs
 pub fn make_catalog(current_catalog: String, catalog_name: String) {
     let id = format!("{}", Uuid::new_v4().to_hyphenated());
     let mut connection = Connection::open("./database/files.db").unwrap();
@@ -122,7 +118,8 @@ pub struct File {
 impl File {
     pub fn insert(&self, table: &str, conn: &mut Connection){
         let mut parts = String::new();
-        self.parts.iter().map(|value| parts.push_str(&format!("{},", value)));
+        self.parts.iter().for_each(|value| parts.push_str(&format!("{},", value)));
+        info!("Parts: {}", parts);
         let req = &format!("INSERT INTO `{}` (id,filename,mimetype,is_catalog,telegram_id,size,parts) values (?1, ?2, ?3, {}, {}, {}, ?4)", table, self.is_catalog, self.telegram_id, self.size);
         info!("Request: {}", req);
         conn.execute(

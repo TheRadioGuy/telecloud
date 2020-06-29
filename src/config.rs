@@ -23,10 +23,12 @@ pub fn load_config() -> Config {
     let mut file = match File::open(&path) {
         Ok(file) => file,
         Err(e) => {
-            error!("Failed to open file: {:?}, making a new one", e);
+            info!("Failed to open file: {:?}, making a new one", e);
             let mut file = File::create(&path).unwrap();
             file.write_all(DEFAULT_CONFIG).unwrap();
-            file
+            file.flush();
+            drop(file); // FIXME: need this because we'd get `bad file descriptor` on linux on #37 line
+            File::open(&path).unwrap()
         }
     };
 
