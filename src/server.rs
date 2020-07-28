@@ -1,55 +1,59 @@
+use std::convert::TryInto;
+use std::io::Write;
+use std::path::PathBuf;
+use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
+
 use crate::filestruct;
+
 use actix_files as fs;
 use actix_multipart::Multipart;
 use actix_web::{http::Method, web, App, Error, HttpResponse, HttpServer, Responder};
 use futures::{StreamExt, TryStreamExt};
 use rusqlite::NO_PARAMS;
 use serde_json::Value;
-use std::convert::TryInto;
-use std::io::Write;
-use std::path::PathBuf;
-use std::sync::mpsc;
-use std::sync::{Arc, Mutex};
 use teloxide::prelude::*;
 use teloxide::types::ChatId;
 use teloxide::types::InputFile;
 use tokio::fs::File;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::io::{BufReader, BufWriter};
+use webdav_handler::actix::*;
+use webdav_handler::{fakels::FakeLs, localfs::LocalFs, DavConfig, DavHandler};
+
 pub static mut CONFIG: Option<crate::config::Config> = None;
 pub static mut CHANNEL: Option<Arc<Mutex<mpsc::Sender<crate::filestruct::SendedFile>>>> = None;
 const MEGABYTES_50: u64 = 50000000;
 
-// #[get("/api/{method}/")]
 async fn api(data: web::Json<Value>, info: web::Path<String>) -> impl Responder {
     let method = info.as_str();
     trace!("Got request, method: {} and params : {:?}", method, data);
     let mut response = format!("Method {} not found", method);
-    match method {
-        "getFiles" => {
-            let catalog = data["catalog"].as_str().unwrap_or("main");
-            let files = filestruct::get_all_files(catalog);
-            let string = serde_json::to_string(&files).unwrap();
-            response = format!("{}", string);
-        }
-        "createCatalog" => {
-            let catalog_name = data["catalog_name"]
-                .as_str()
-                .unwrap_or("new_catalog")
-                .to_owned();
-            let current_catalog = data["current_catalog"]
-                .as_str()
-                .unwrap_or("main")
-                .to_owned();
-            web::block(move || {
-                Ok::<_, ()>(filestruct::make_catalog(current_catalog, catalog_name))
-            })
-            .await
-            .unwrap();
-            response = "OK".to_owned();
-        }
-        _ => {}
-    }
+    // match method {
+    //     "getFiles" => {
+    //         let catalog = data["catalog"].as_str().unwrap_or("main");
+    //         let files = filestruct::get_all_files(catalog);
+    //         let string = serde_json::to_string(&files).unwrap();
+    //         response = format!("{}", string);
+    //     }
+    //     "createCatalog" => {
+    //         let catalog_name = data["catalog_name"]
+    //             .as_str()
+    //             .unwrap_or("new_catalog")
+    //             .to_owned();
+    //         let current_catalog = data["current_catalog"]
+    //             .as_str()
+    //             .unwrap_or("main")
+    //             .to_owned();
+    //         web::block(move || {
+    //             Ok::<_, ()>(filestruct::make_catalog(current_catalog, catalog_name))
+    //         })
+    //         .await
+    //         .unwrap();
+    //         response = "OK".to_owned();
+    //     }
+    //     _ => {}
+    // }
 
     response
 }
@@ -190,9 +194,7 @@ pub async fn run(config: crate::config::Config) {
                 tokio::fs::remove_file(info.file.clone()).await.unwrap();
 
                 let mut db = rusqlite::Connection::open("./database/files.db").unwrap();
-
-                let catalog_name = info.catalog.as_str();
-                info.info.insert(catalog_name, &mut db); // insert catalog into current one
+                info.info.insert(&mut db); // insert catalog into current one
 
                 info!("Saved to database!");
             })
@@ -204,17 +206,17 @@ pub async fn run(config: crate::config::Config) {
     println!("Started on 127.0.0.1:{}", port);
 
     HttpServer::new(|| {
-        let propfind = Method::from_bytes(b"GET").unwrap();
+        let dav_server = DavHandler::builder()
+            .filesystem(LocalFs::new(".", false, false, false))
+            .locksystem(FakeLs::new())
+            .build_handler();
+
         App::new()
+            .data(dav_server.clone())
+            .service(web::resource("/webdav{tail:.*}").to(crate::webdav::dav_handler))
             .service(fs::Files::new("/static", "./static").show_files_listing())
             .route("/api/{method}/", web::post().to(api))
             .route("/upload/{dir}/", web::post().to(save_file))
-            .service(web::scope("/webdav").default_service(web::to(crate::webdav::webdav_handle)))
-        // .service(
-        //     // web::scope("/webdav").route("/", web::get().to(webdav)),
-        //     // web::scope("/webdav").route("/", web::method(propfind).to(webdav))
-        //     web::scope("/webdav").route("/", web::route().to(webdav))
-        // )
     })
     .bind(&format!("127.0.0.1:{}", port))
     .unwrap()
